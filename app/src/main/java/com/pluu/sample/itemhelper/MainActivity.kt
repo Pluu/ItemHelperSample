@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
             itemTouchHelper.startDrag(holder)
         }
         binding.listView.adapter = adapter
+        binding.listView.addItemDecoration(SampleItemDecoration())
 
         callback.setAdapter(adapter)
     }
