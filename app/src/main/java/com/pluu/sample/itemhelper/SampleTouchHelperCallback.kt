@@ -37,6 +37,14 @@ class SampleTouchHelperCallback : ItemTouchHelper.Callback() {
         }
     }
 
+    override fun canDropOver(
+        recyclerView: RecyclerView,
+        current: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
+        return adapter.canDropOver(recyclerView, current, target)
+    }
+
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
