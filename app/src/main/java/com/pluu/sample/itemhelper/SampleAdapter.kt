@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class SampleAdapter(
     private val onItemLongClick: (holder: RecyclerView.ViewHolder) -> Unit
-) : RecyclerView.Adapter<SampleViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val MOVEABLE_LIMIT_INDEX = 10
 
@@ -20,24 +20,37 @@ class SampleAdapter(
                 (0..255).random()
             )
         )
-    }.toMutableList()
+    }.toMutableList<Any>().apply {
+        add(MOVEABLE_LIMIT_INDEX, Divider)
+    }
 
     init {
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SampleViewHolder {
-        return SampleViewHolder.newInstance(parent).apply {
-            itemView.setOnLongClickListener {
-                onItemLongClick(this)
-                true
-            }
+    override fun getItemViewType(position: Int): Int {
+        return when (list[position]) {
+            is Item -> 0
+            else -> 1
         }
-
     }
 
-    override fun onBindViewHolder(holder: SampleViewHolder, position: Int) {
-        holder.onBind(list[position])
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            0 -> SampleViewHolder.newInstance(parent).apply {
+                itemView.setOnLongClickListener {
+                    onItemLongClick(this)
+                    true
+                }
+            }
+            else -> DividerViewHolder.newInstance(parent)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is SampleViewHolder) {
+            holder.onBind(list[position] as Item)
+        }
     }
 
     override fun getItemCount(): Int = list.size
@@ -57,7 +70,7 @@ class SampleAdapter(
         )
         if (target.bindingAdapterPosition == 0) {
             return false
-        } else if (target.bindingAdapterPosition < MOVEABLE_LIMIT_INDEX && current.bindingAdapterPosition >= MOVEABLE_LIMIT_INDEX) {
+        } else if (target.bindingAdapterPosition <= MOVEABLE_LIMIT_INDEX && current.bindingAdapterPosition >= MOVEABLE_LIMIT_INDEX) {
             return false
         }
         return true
